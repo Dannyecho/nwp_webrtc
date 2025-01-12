@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 02, 2025 at 04:54 PM
+-- Generation Time: Jan 12, 2025 at 11:33 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -139,6 +139,7 @@ CREATE TABLE `chat_profile` (
   `chat_profile6992` int(11) DEFAULT NULL,
   `chat_profile6993` int(11) DEFAULT NULL,
   `chat_profile7015` varchar(100) DEFAULT NULL,
+  `chat_profile7016` int(11) DEFAULT NULL,
   `serial_num` int(11) NOT NULL,
   `creator_role` varchar(100) DEFAULT NULL,
   `created_source` varchar(100) DEFAULT NULL,
