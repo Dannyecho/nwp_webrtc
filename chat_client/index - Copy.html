@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple WebSocket Chat</title>
+    <style>
+        #chat-container {
+            width: 400px;
+            border: 1px solid #ccc;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+        #messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        #message-form {
+            display: flex;
+            padding: 10px;
+        }
+        #message-input {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="login-container">
+        <input type="text" id="username" placeholder="Enter username">
+        <button id="login-btn">Join Chat</button>
+    </div>
+
+    <div id="chat-container" style="display:none;">
+        <div id="messages"></div>
+        <form id="message-form">
+            <input type="text" id="message-input" placeholder="Type a message">
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

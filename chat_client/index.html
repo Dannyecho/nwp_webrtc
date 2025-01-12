@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Private Chat System</title>
+    <style>
+        #chat-section { display: flex; }
+        #users-panel { width: 250px; border-right: 1px solid #ccc; }
+        #chat-container { flex-grow: 1; }
+        #user-connections li { 
+            cursor: pointer; 
+            padding: 10px; 
+            border-bottom: 1px solid #eee; 
+        }
+        #user-connections li:hover { background-color: #f0f0f0; }
+        #chat-messages { 
+            height: 400px; 
+            overflow-y: auto; 
+            border: 1px solid #ccc; 
+            padding: 10px; 
+        }
+    </style>
+</head>
+<body>
+    <div id="login-section">
+        <form id="login-form">
+            <input type="text" id="username" placeholder="Username" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <div id="chat-section" style="display:none;">
+        <div id="users-panel">
+            <h3>Your Connections: <small id="current-user"></small></h3>
+            <ul id="user-connections"></ul>
+        </div>
+
+        <div id="chat-container" style="display:none;">
+            <div id="chat-receiver"></div>
+			<div id="typing-indicator" style="display:none;"></div>
+            <div id="chat-messages"></div>
+            <div id="message-input-container">
+                <input type="text" id="message-input" placeholder="Type your message...">
+                <button onclick="sendPrivateMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

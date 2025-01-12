@@ -1,0 +1,3 @@
+ CREATE TABLE `vine_pison2`.`webrtc_main` ( `id` varchar(33) NOT NULL , `serial_num` int(11) NOT NULL, `creator_role` varchar(100) DEFAULT NULL, `created_source` varchar(100) DEFAULT NULL, `created_by` varchar(100) DEFAULT NULL, `creation_date` int(11) DEFAULT NULL, `modified_source` varchar(100) DEFAULT NULL, `modified_by` varchar(100) DEFAULT NULL, `modification_date` int(11) DEFAULT NULL, `ip_address` varchar(50) DEFAULT NULL, `device_id` text NOT NULL, `record_status` varchar(4) DEFAULT NULL ) ENGINE=InnoDB DEFAULT CHARSET=latin1 ; 
+ALTER TABLE `vine_pison2`.`webrtc_main` ADD PRIMARY KEY (`serial_num`), ADD UNIQUE KEY `id` (`id`) ; 
+ALTER TABLE `vine_pison2`.`webrtc_main` MODIFY `serial_num` int(11) NOT NULL AUTO_INCREMENT ; 

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Peer 1</title>
+</head>
+<body>
+    <h1>WebRTC Peer 1</h1>
+    <textarea id="localDescription" readonly rows="5" cols="50"></textarea>
+    <textarea id="remoteDescription" rows="5" cols="50"></textarea>
+    <button id="connect">Connect</button>
+    <hr>
+    <div>
+        <input type="text" id="messageInput" placeholder="Type a message..." />
+        <button id="sendMessage">Send</button>
+    </div>
+    <div id="messages"></div>
+    <script>
+        const localDescriptionBox = document.getElementById('localDescription');
+        const remoteDescriptionBox = document.getElementById('remoteDescription');
+        const connectButton = document.getElementById('connect');
+        const messageInput = document.getElementById('messageInput');
+        const sendMessageButton = document.getElementById('sendMessage');
+        const messagesDiv = document.getElementById('messages');
+
+        // Create a new peer connection
+        const peerConnection = new RTCPeerConnection({
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        });
+
+        // Create a data channel for messaging
+        const dataChannel = peerConnection.createDataChannel('chat');
+
+        // Handle messages received on the data channel
+        dataChannel.onmessage = (event) => {
+            const message = document.createElement('p');
+            message.textContent = `Received: ${event.data}`;
+            messagesDiv.appendChild(message);
+        };
+
+        dataChannel.onopen = () => {
+            console.log('Data channel is open');
+        };
+
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                console.log('New ICE candidate:', event.candidate);
+            }
+        };
+
+        // Create an offer and set it as the local description
+        peerConnection.createOffer().then((offer) => {
+            return peerConnection.setLocalDescription(offer);
+        }).then(() => {
+            localDescriptionBox.value = JSON.stringify(peerConnection.localDescription);
+        });
+
+        // Handle the connect button click
+        connectButton.onclick = () => {
+            const remoteDescription = JSON.parse(remoteDescriptionBox.value);
+            peerConnection.setRemoteDescription(remoteDescription);
+        };
+
+        // Handle the send button click
+        sendMessageButton.onclick = () => {
+            const message = messageInput.value;
+            if (message && dataChannel.readyState === 'open') {
+                dataChannel.send(message);
+                const sentMessage = document.createElement('p');
+                sentMessage.textContent = `Sent: ${message}`;
+                sentMessage.style.color = 'blue'; // Different color for sent messages
+                messagesDiv.appendChild(sentMessage);
+                messageInput.value = ''; // Clear the input field
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Peer 2</title>
+</head>
+<body>
+    <h1>WebRTC Peer 2</h1>
+    <textarea id="localDescription" readonly rows="5" cols="50"></textarea>
+    <textarea id="remoteDescription" rows="5" cols="50"></textarea>
+    <button id="connect">Connect</button>
+    <hr>
+
+    <div>
+        <h2>Messages</h2>
+        <input type="text" id="messageInput" placeholder="Type a message..." />
+        <button id="sendMessage">Send</button>
+        <div id="messages"></div>
+    </div>
+    <hr>
+
+    <div>
+        <h2>Video Call</h2>
+        <video id="localVideo" autoplay playsinline muted></video>
+        <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+
+    <script>
+        // DOM Elements
+        const localDescriptionBox = document.getElementById('localDescription');
+        const remoteDescriptionBox = document.getElementById('remoteDescription');
+        const connectButton = document.getElementById('connect');
+        const messageInput = document.getElementById('messageInput');
+        const sendMessageButton = document.getElementById('sendMessage');
+        const messagesDiv = document.getElementById('messages');
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+
+        // WebRTC Setup
+        const peerConnection = new RTCPeerConnection({
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        });
+
+        let dataChannel;
+        let isDataChannelOpen = false;
+
+        // Handle incoming data channel from Peer 1
+        peerConnection.ondatachannel = (event) => {
+            dataChannel = event.channel;
+
+            dataChannel.onmessage = (event) => {
+                console.log('Received message:', event.data);
+                const message = document.createElement('p');
+                message.textContent = `Received: ${event.data}`;
+                messagesDiv.appendChild(message);
+            };
+
+            dataChannel.onopen = () => {
+                console.log('Data channel opened');
+                isDataChannelOpen = true;
+            };
+
+            dataChannel.onclose = () => {
+                console.log('Data channel closed');
+                isDataChannelOpen = false;
+            };
+
+            dataChannel.onerror = (error) => {
+                console.log('Data channel error:', error);
+            };
+        };
+
+        // Video Call Stream
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then((stream) => {
+                localVideo.srcObject = stream;
+                stream.getTracks().forEach((track) => {
+                    peerConnection.addTrack(track, stream);
+                });
+            });
+
+        peerConnection.ontrack = (event) => {
+            if (event.streams[0]) {
+                remoteVideo.srcObject = event.streams[0];
+            }
+        };
+
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                console.log('New ICE candidate:', event.candidate);
+            }
+        };
+
+        // Send Message (only when data channel is open)
+        sendMessageButton.onclick = () => {
+            const message = messageInput.value;
+            if (message && isDataChannelOpen) {
+                dataChannel.send(message);
+                console.log('Sent message:', message);
+                const sentMessage = document.createElement('p');
+                sentMessage.textContent = `Sent: ${message}`;
+                sentMessage.style.color = 'blue';
+                messagesDiv.appendChild(sentMessage);
+                messageInput.value = '';
+            } else {
+                console.log('Cannot send message. Data channel not open.');
+            }
+        };
+
+        connectButton.onclick = () => {
+            const remoteDescription = JSON.parse(remoteDescriptionBox.value);
+            peerConnection.setRemoteDescription(remoteDescription);
+
+            // Create and send answer after setting remote description
+            peerConnection.createAnswer().then((answer) => {
+                return peerConnection.setLocalDescription(answer);
+            }).then(() => {
+                localDescriptionBox.value = JSON.stringify(peerConnection.localDescription);
+            });
+        };
+    </script>
+</body>
+</html>

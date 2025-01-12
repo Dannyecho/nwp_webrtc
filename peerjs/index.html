@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Language" content="en">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>NWP WEBRTC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
+    <meta name="description" content="NWP WEBRTC">
+    <meta name="msapplication-tap-highlight" content="no">
+	
+  
+</head>
+<body>
+   <div id="nwp-connection" style="position: fixed;bottom:0;left:0;z-index:99999;"></div>
+   <div id="nwp-audio" style="position: fixed;bottom:0;left:0;z-index:99999;"></div>
+   <div id="notification-container" style="max-width:300px;"></div>
+	
+	<div id="generate-report-progress-bar"></div>
+   <div id="mis-container">
+	</div>
+	
+
+   <script src="peerjs.min.js" type="text/javascript"></script>
+
+	<script id="nwp-home-script">
+		const peer = new Peer('nwp-peer-id-001', {
+			debug: 3, secure: false,
+		});
+		/*const peer = new Peer({
+			host: 'localhost',
+			port: 8080,
+			path: '/signaling', // Matches the PHP server route
+			secure: false, // Use true if using HTTPS
+			config: {
+				iceServers: [
+					{ url: 'stun:stun.l.google.com:19302' }, // Add STUN/TURN servers as needed
+				],
+			},
+		});*/
+
+		// Handle PeerJS events
+		peer.on('open', (id) => {
+			console.log('Peer ID:', id);
+		});
+
+peer.on('error', (err) => {
+    console.error('PeerJS Error:', err);
+});
+
+		// Connect to another peer
+		/*const conn = peer.connect('nwp-peer-id-002');
+		conn.on('open', () => {
+			conn.send('Hi from nwp-peer-id-001 this peer!');
+		});
+conn.on('error', (err) => {
+    console.error('Connection Error:', err);
+});*/
+
+		peer.on('connection', (conn) => {
+			console.log('Conn Info:', conn);
+			conn.on('data', (data) => {
+				console.log('Received:', data);
+			});
+
+			conn.on('open', () => {
+				conn.send('Hello!');
+			});
+		});
+	</script>
+</body>
+</html>
