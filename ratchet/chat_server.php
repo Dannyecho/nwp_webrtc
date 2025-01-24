@@ -85,6 +85,7 @@ class PrivateChatServer implements \Ratchet\MessageComponentInterface {
         $offset = isset( $data['offset'] ) ? intval( $data['offset'] ) : '';
         $chunk = isset( $data['chunk'] ) ? base64_decode($data['chunk'] ) : '';
         $file_ext = isset( $data['file_ext'] ) ? $data['file_ext'] : '';
+        $receiverId = isset( $data[ 'receiver' ] ) ? $data[ 'receiver' ] : '';
         unset( $data[ 'chunk' ] );
         print_r( $data );
         $error = 0;
@@ -135,6 +136,11 @@ class PrivateChatServer implements \Ratchet\MessageComponentInterface {
                 touch( $filename );
                 file_put_contents( $filename, $this->_files[ $file_id ] );
                 unset( $this->_files[ $file_id ] );
+
+                // Send to receiver if online
+                if ( isset( $this->clients[ $receiverId ] ) ) {
+                    $this->clients[ $receiverId ]->send( json_encode( $responseData ) );
+                }
             }
 
             if( $responseData ){

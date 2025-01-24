@@ -44,16 +44,6 @@ var nwLChat = {
 			nwLChat.selectUser(user, userAvatar.style.backgroundColor);
 		});
 
-		// Activate magnific popup
-		$('body .nwl-chat-gallery').each(function() { // the containers for all your galleries
-			$(this).magnificPopup({
-				delegate: 'a', // the selector for gallery item
-				type: 'image',
-				gallery: {
-					enabled: true
-				}
-			});
-		});
 		nwLChat.connectionToken = '';
 		nwLChat.reconnectAttempts = 0;
 		nwLChat.doNotReconnect = false;
@@ -401,6 +391,7 @@ var nwLChat = {
 								<div class="widget-content-left">
 									<div class="widget-heading"></div>
 									<div class="widget-subheading"></div>
+									<div class="widget-is-typing"></div>
 								</div>
 							</div>
 						</div>
@@ -659,6 +650,16 @@ var nwLChat = {
 		if( chatData.hasOwnProperty( 'unread_msg_count' ) && chatData.unread_msg_count ){
 			nwLChat.sendReadReceipt(nwLChat.currentReceiver.id)
 		}
+
+		const typing_indicator = $(`
+			<div id="typing-indicator-${nwLChat.currentReceiver.id}" class="typing-indicator chat-box-typing-indicator">
+					<span class="typing-dot"></span>
+					<span class="typing-dot"></span>
+					<span class="typing-dot"></span>
+				</div>`);
+				typing_indicator.hide();
+
+		chatBox.appendChild(typing_indicator[0]);
 	},
 	addNewMessage: function (messageData, receiverData, options) {
 		let chatBoxGroup = $('#msg-group-wrapper-today');
@@ -701,14 +702,7 @@ var nwLChat = {
 				$(chatsContainer).append(chatBoxGroup);
 			}
 		}
-		const typing_indicator = $(`
-			<div id="typing-indicator-${nwLChat.currentReceiver.id}" class="typing-indicator chat-box-typing-indicator">
-					<span class="typing-dot"></span>
-					<span class="typing-dot"></span>
-					<span class="typing-dot"></span>
-				</div>`);
-				typing_indicator.hide();
-		chatsContainer.append(typing_indicator);
+		
 		return $(chatsContainer)[0];
 	},
 	generateChatBox: function (chatData) {
@@ -749,11 +743,20 @@ var nwLChat = {
 						content = '<i class="far fa-image"></i>&nbps;&nbps;'+ chatData.status;
 					break;
 					default:
-						content = `<div class="nwl-chat-gallery">
+						content = $(`<div class="nwl-chat-gallery">
 							<a href="${nwLChat.plugir_uri + chatData.id + '.'+ chatData.text }">
 								<img width="200px" style="object-fit:cover;" src="${nwLChat.plugir_uri + chatData.id + '.'+ chatData.text }" >
 							</a>
-						</div>`;
+						</div>`);
+						
+						// Activate magnific popup
+						$(content).magnificPopup({
+							delegate: 'a', // the selector for gallery item
+							type: 'image',
+							gallery: {
+								enabled: true
+							}
+						});
 					break;
 				}
 			break
@@ -773,7 +776,7 @@ var nwLChat = {
 						content = '<i class="fa fa-file"></i>&nbsp;&nbsp;'+ chatData.status;
 						break;
 					default:
-						content = `<a class="btn btn-outline-secondary rounded" href="${nwLChat.plugir_uri + chatData.id + '.'+ chatData.text }"><i class="fa fa-file"></i>&nbsp; Document</a>`
+						content = `<a target="_blank" class="btn btn-outline-secondary rounded" href="${nwLChat.plugir_uri + chatData.id + '.'+ chatData.text }"><i class="fa fa-file"></i>&nbsp; Document</a>`
 					break;
 				}
 			break;
@@ -828,6 +831,15 @@ var nwLChat = {
 		}
 	},
 	handleTypingIndicator: function (data) {
+		if( data.senderId ){
+			let isTypingWidget = $('#user-chat-'+ data.senderId).find( '.widget-is-typing' );
+			if( data.isTyping ){
+				isTypingWidget.text('is typing...');
+			}else{
+				isTypingWidget.text('');
+			}
+		}
+
 		// Only show typing indicator for the currently selected user
 		if (nwLChat.currentReceiver && data.senderId === nwLChat.currentReceiver.id) {
 			const typingIndicator = $('#typing-indicator-'+data.senderId );
@@ -835,7 +847,7 @@ var nwLChat = {
 			if (data.isTyping) {
 				typingIndicator.show(300);
 			} else {
-				typingIndicator.hide(300);
+				typingIndicator.hide(100);
 			}
 		}
 	},
@@ -886,6 +898,7 @@ var nwLChat = {
 		});
 	},
 	sendPrivateMessage: function () {
+		// alert("About send message");
 		const messageInput = document.getElementById('message-input');
 		const message = messageInput.value.trim();
 		const messageId = nwLChat.generateUniqueId(); // Implement unique ID generation
@@ -894,6 +907,7 @@ var nwLChat = {
 			// Add message to chat with unique ID
 			const chatMessage = {
 				id: messageId,
+				type: 'private_message',
 				type_of_receiver: 'user',
 				message_type: 'text',
 				sender: nwLChat.currentUser.id,
@@ -966,10 +980,10 @@ var nwLChat = {
 		return `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 	},
 
-	scrollToTheEndOfChat: function () {
+	scrollToTheEndOfChat: function (scrollEffect = false) {
 		const wrapper = $('.chat-wrapper');
 		if (wrapper.length) {
-			wrapper.animate({ scrollTop: $(wrapper)[0].scrollHeight }, 'slow');
+			wrapper.animate({ scrollTop: $(wrapper)[0].scrollHeight }, scrollEffect ? 'slow' : 'fast' );
 		}
 	},
 
