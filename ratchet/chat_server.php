@@ -87,7 +87,7 @@ class PrivateChatServer implements \Ratchet\MessageComponentInterface {
         $file_ext = isset( $data['file_ext'] ) ? $data['file_ext'] : '';
         $receiverId = isset( $data[ 'receiver' ] ) ? $data[ 'receiver' ] : '';
         unset( $data[ 'chunk' ] );
-        print_r( $data );
+        // print_r( $data );
         $error = 0;
 
         if( $file_id && $mime_arg ){

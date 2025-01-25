@@ -41,7 +41,7 @@ var nwLChat = {
 			user.username = user.name;
 			let userAvatar = nwLChat.generateAvatarIcon(user, {});
 			console.log(user);
-			nwLChat.selectUser(user, userAvatar.style.backgroundColor);
+			nwLChat.selectUser(user, userAvatar.css('background-color'));
 		});
 
 		nwLChat.connectionToken = '';
@@ -213,10 +213,11 @@ var nwLChat = {
 
 				reader.onloadend = (event) => {
 					let result = event.target.result;
-					let chunk = new Uint8Array( result.slice(offset, offset + chunkSize) ) ; // Slice the next chunk
+					let chunk = new Uint8Array( result.slice(offset, offset + chunkSize) ) ; 
+
 					base64String = btoa(String.fromCharCode.apply(null, chunk)); 
 
-					console.log( 'chunk type', (chunk instanceof ArrayBuffer) )
+					// console.log( 'chunk type:', (chunk instanceof ArrayBuffer) )
 
 					// console.log( 'chunk', chunk );
 					socket.send(JSON.stringify({
